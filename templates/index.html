@@ -1,0 +1,270 @@
+{% extends './layout.html' %}
+
+{% block title %}
+  José Luis Rizzo | Inicio
+{% endblock %}
+
+{% block navitems %}
+<div class="collapse navbar-collapse" id="header-navbar">
+  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <li class="nav-item d-md-none"><a href="../#carousel" class="nav-link active">Inicio</a></li>
+    {% for category in categories %}
+      <li class="nav-item d-md-none"><a href="../showall/{{category[0]}}" class="nav-link active">{{ category[1] }}</a></li>
+    {% endfor %}
+    <li class="nav-item d-md-none"><a href="../#contacto" class="nav-link">Contacto</a></li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block aside %}
+<aside>
+  <nav class="d-none d-md-flex side-nav justify-content-center">
+    <div class="element-container">
+      <div class="side-logo-holder"></div>
+      <div class="side-navigation" id="sidenavbar">
+        <a href="../" class="side-nav-link active">HOME</a>
+        {% for category in categories %}
+          <a href="../showall/{{category[0]}}" class="side-nav-link">{{ category[1].upper() }}</a>
+        {% endfor %}
+        <a href="../#contacto" class="side-nav-link">CONTACTO</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+{% endblock %}
+
+{% block main %}
+
+{% with errors = get_flashed_messages(category_filter=["error"]) %}
+  {% if errors %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-10 mt-4 alert alert-danger alert-dismissible fade show" role="alert">
+        {%- for msg in errors %}
+          <p class="mb-0"><i class="bi bi-exclamation-circle"></i>&nbsp;{{ msg }}</p>
+        {% endfor -%}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endwith %}
+{% with errors = get_flashed_messages(category_filter=["success"]) %}
+  {% if errors %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-10 mt-4 alert alert-success alert-dismissible fade show" role="alert">
+        {%- for msg in errors %}
+          <p class="mb-0"><i class="bi bi-check-circle"></i>&nbsp;{{ msg }}</p>
+        {% endfor -%}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endwith %}
+
+<div id="carousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+<div class="carousel-indicators">
+  <button type="button" data-bs-target="#carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+  {% set ns = namespace(items=1) %}
+  {% for category in categories %}
+    {% if category[2] %}
+      <button type="button" data-bs-target="#carousel" data-bs-slide-to="{{ ns.items }}" aria-label="Slide {{ ns.items + 1 }}"></button>
+      {% set ns.items = ns.items + 1 %}
+    {% endif %}
+  {% endfor %}
+</div>
+<div class="carousel-inner">
+  <div class="carousel-item active" id="slide-00">
+    <div class="container h-100">
+      <div class="row h-50">
+        <div class="col-12">
+          <p class="text-center carousel-title">Ventas y Alquileres</p>
+        </div>
+      </div>
+      <div class="row h-50">
+        <div class="col-12 text-center">
+          <a href="#contacto" class="btn btn-lg btn-danger col-6 col-sm-3 col-lg-0 carousel-btn text-center">Hablemos</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% set ns = namespace(count=1) %}
+  {% for category in categories %}
+    {% if category[2] %}
+      <div class="carousel-item" id="slide-0{{ ns.count }}" style="background-image: url(/static/images/upload/{{category[3]}});">
+        <div class="container h-100">
+          <div class="row h-50">
+            <div class="col-12">
+              <span class="text-center carousel-title">{{category[1]}}</span>
+            </div>
+          </div>
+          <div class="row h-50">
+            <div class="col-12 text-center">
+              <a href="./showall/{{category[0]}}" class="btn btn-lg btn-danger col-6 col-sm-3 col-lg-0 carousel-btn text-center">Ver todos</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% set ns.count = ns.count + 1 %}
+    {% endif %}
+  {% endfor %}
+</div>
+<button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+  <span class="bs-carousel-icon"><i class="bi bi-chevron-left"></i></span>
+  <span class="visually-hidden">Anterior</span>
+</button>
+<button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+  <span class="bs-carousel-icon"><i class="bi bi-chevron-right"></i></span>
+  <span class="visually-hidden">Siguiente</span>
+</button>
+</div>
+<div class="black-divider-top"></div>
+<div class="nav main-nav d-flex align-items-center flex-wrap pt-2 pt-md-0">
+<ul class="nav-ul m-0 d-flex justify-content-center flex-wrap">
+  {% for category in categories %}
+    <li class="flex-fill text-center p-2"><a href="#{{ category[1] }}" class="main-nav-link">{{ category[1].upper() }} </a></li>
+  {% endfor %}
+</ul>
+</div>
+<div class="black-divider-bottom"></div>
+
+<header class="py-4 text-center" id="search-header">
+  <h1>Nuestro catálogo</h1>
+  <section class="container text-center bg-light p-4 rounded-2">
+    <form action="/vehicles/search" method="post" enctype="multipart/form-data" class="col col-sm-10 col-lg-8 m-auto">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="input-group col col-sm-6">
+        <label for="search-box" class="input-group-text bg-primary-subtle">Buscar vehículo</label>
+        <input type="text" name="criteria" id="search-box" value="{{criteria}}" class="form-control" required>
+        <button type="submit" class="btn btn-sm btn-primary align-baseline"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+  </section>
+</header>
+
+{% for category in categories %}
+  {# Recorre la lista de vehículos para comprobar que exista al menos uno de la categoría que esté activo #}
+  {# y utiliza la variable global ns.found dentro del scope del 'for category' para registrar el resultado #}
+  {% set ns = namespace(found=false) %}
+  {% for vehicle in vehicles %}
+    {% if vehicle[9] == category[1] and vehicle[11] %}
+      {% set ns.found = true %}
+    {% endif %}
+  {% endfor %}
+
+  {% if ns.found %}{# Si encontró al menos un vehículo activo de la categoría, crea la sección #}
+  <div class="container section-container mt-2" id="{{category[1]}}">
+    <h2 class="section-title text-center pt-3">
+      {{category[1]}}&nbsp;
+      <a href="../showall/{{category[0]}}" class="btn btn-outline-primary align-middle mb-1" style="font-family: 'ABeeZee', sans-serif; text-transform: capitalize;"><i class="bi bi-eye"></i>&nbsp;Ver todos</a>
+    </h2>
+    <!--<a href="../showall/{{category[0]}}" class="btn btn-outline-secondary text-end">Ver todos los {{category[1]}}</a>-->
+    <div class="row justify-content-center row-cols-1 row-cols-sm-2 row-cols-md-3 g-0 col-10 mx-auto">
+    {% set ns = namespace(count=1) %}
+    {% for vehicle in vehicles %}
+      {% if vehicle[9] == category[1] and vehicle[11] and ns.count < 4%}
+        <div class="col">
+          <div class="card h-100 mx-auto">
+            <img src="{{ url_for('static', filename='images/upload/' + vehicle[2]) }}" alt="Foto del vehículo" class="rounded-top">
+            <div class="card-body pb-0">
+              <h5 class="card-title">{{ vehicle[3] }}</h5>
+              <p class="card-text m-0">Marca: {{ vehicle[4] }}</p>
+              <p class="card-text m-0">Modelo: {{ vehicle[5] }}</p>
+              {% if vehicle[6] >= 1900 %}
+                <p class="card-text m-0">Año: {{ vehicle[6] }}</p>
+              {% endif %}
+              <p class="card-text">{{ vehicle[7] }}</p>
+            </div>
+            <div class="card-footer bg-transparent">
+              <a href="detail/{{vehicle[0]}}" class="btn btn-outline-primary w-100">Conocer más</a>
+            </div>
+          </div>
+        </div>
+        {% set ns.count = ns.count + 1 %}
+      {% endif %}
+    {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+{% endfor %}
+
+<section class="container cta-container mx-auto d-flex flex-wrap justify-content-center align-items-center rounded-2" id="hablemos">
+  <div class="row justify-content-evenly align-items-center p-4 bg-light w-100 mt-4 mt-sm-0">
+    <div class="col-12 col-sm-7 text-center text-sm-start">
+      <h2 class="" style="color: black;">¿Querés vender tu usado?</h2>
+    </div>
+    <div class="col-12 col-sm-3 text-center text-sm-end">
+      <button class="btn btn-danger fs-3">Hablemos</button>
+    </div>
+  </div>
+  <div class="row justify-content-center w-100 mt-4">
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/iveco-logo.png') }}" alt="Iveco" class="brand-holder w-75"></div>
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/toyota-logo.png') }}" alt="Toyota" class="brand-holder w-75"></div>
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/mercedes-benz-logo.png') }}" alt="Mercedes Benz" class="brand-holder w-75"></div>
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/audi-logo.png') }}" alt="Audi" class="brand-holder w-75"></div>
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/caterpillar-logo.jpg') }}" alt="Caterpillar" class="brand-holder w-75"></div>
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/ford-logo.png') }}" alt="Ford" class="brand-holder w-75"></div>
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/john-deere-logo.jpg') }}" alt="John Deere" class="brand-holder w-75"></div>
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/jlg-logo.jpg') }}" alt="JLG" class="brand-holder w-75"></div>
+    <div class="col-3 col-md-2 col-lg-0 d-flex justify-content-center align-items-center"><img src="{{ url_for('static', filename='images/car_brands/bmw-logo.png') }}" alt="BMW" class="brand-holder w-75"></div>
+  </div>
+</section>
+<section class="container-fluid">
+  <div class="row">
+    <div class="divider green-divider-top"></div>
+    <div class="divider green-divider-bottom"></div>
+  </div>
+</div>
+<div class="container section-container p-0 w-75 mx-auto" id="ubicacion">
+  <h1 class="section-title text-center pt-3">Ubicación</h1>
+  <div class="row d-flex justify-content-center" id="map-holder">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3278.303540419138!2d-58.335552625057986!3d-34.74794576512812!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95a32de35d49ee1d%3A0xce8851c794c2dd06!2sJose%20Luis%20Rizzo%20Compra%2C%20Venta%20Y%20Alquiler%20De%20Camiones%20Y%20Maquinarias!5e0!3m2!1ses-419!2sar!4v1703095634286!5m2!1ses-419!2sar" width="800" height="800" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+<section class="container-fluid d-flex section-container justify-content-center align-items-center mt-4" id="contacto">
+  <div class="row justify-content-evenly w-100">
+    <div class="col-10 col-md-5">
+      <h2 class="contact-title mt-4">Hablemos</h2>
+      <p class="contact-item"><i class="bi bi-envelope header-nav-icon px-2 align-middle"></i>&nbsp;ventas@joseluisrizzo.com</p>
+      <p class="contact-item"><i class="bi bi-whatsapp header-nav-icon px-2 align-middle"></i>&nbsp;(011) 15 5308-8761</p>
+      <p class="contact-item"><i class="bi bi-geo-alt header-nav-icon px-2 align-middle"></i>&nbsp;Av. Tomas Flores 2400 <span class="d-none d-lg-inline-block">, Quilmes Oeste - Bs. As.</span></p>
+    </div>
+    <div class="col-10 col-md-5 form-container my-4">
+      <form class="contact-form my-4" name="contact-form" id="contact-form" method="POST" action="/contact/index">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="id" id="id" value="0">
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="name" name="name" aria-describedby="nombre" required>
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Teléfono</label>
+          <input type="text" class="form-control" id="phone" name="phone" aria-describedby="teléfono">
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo electrónico</label>
+          <input type="email" class="form-control" id="email" name="email" aria-describedby="email-help" required>
+          <div id="email-help" class="form-text">Nunca compartiremos tu información con nadie</div>
+        </div>
+        <div class="mb-3">
+          <label for="message" class="form-label">Consulta</label>
+          <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            <label for="human" class="form-label">Resolver: 5+2=?</label>
+            <input type="text" class="form-control" id="human" name="human" aria-describedby="solve" required>
+          </div>
+          <div class="col-6 d-flex align-items-end">
+            <button type="submit" class="btn btn-warning">Enviar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

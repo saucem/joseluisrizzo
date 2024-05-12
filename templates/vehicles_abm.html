@@ -1,0 +1,205 @@
+{% extends './abm_layout.html' %}
+
+{% block title %}
+  José Luis Rizzo | Listado de vehículos
+{% endblock %}
+
+{% block navTitle %}
+  Listado de vehículos
+{% endblock %}
+
+{% block navAction %}
+  <a href="../vhc_create" class="col-2 btn btn-success"><i class="bi bi-add"></i>Nuevo vehículo</a>
+{% endblock %}
+
+{% block main %}
+<main>
+
+  <button onclick="topFunction()" id="top-btn" title="Ir arriba" class="btn btn-success"><i class="bi bi-chevron-up"></i></button>
+
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="container">
+    <div class="row justify-content-center align-items-center my-4">
+      <div class="col-12 col-sm-1 align-items-center">
+        <p class="category-title m-0">Categorías:</p>
+      </div>
+      <div class="col">
+        {% for category in categories %}
+          <a href="#{{category[1]}}" class="btn btn-outline-secondary my-1">{{category[1]}}</a>
+        {% endfor %}
+      </div>
+      <div class="col-12 col-sm-2 text-end">
+        <a href="../cat_create" class="btn btn-warning">Nueva categoría</a>
+      </div>
+    </div>
+
+    <section class="row justify-content-center">
+      <form action="/search_by_domain" method="post" class="col col-sm-6 col-lg-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="input-group col col-sm-6">
+          <label for="search-box" class="input-group-text">Buscar vehículo</label>
+          <input type="text" name="domain" id="search-box" placeholder="Dominio" style="text-transform: uppercase;" class="form-control" required>
+          <button type="submit" class="btn btn-sm btn-primary align-baseline"><i class="bi bi-search"></i></button>
+        </div>
+      </form>
+      {% with errors = get_flashed_messages(category_filter=["error"]) %}
+        {% if errors %}
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-10 mt-4 alert alert-danger alert-dismissible fade show" role="alert">
+              {%- for msg in errors %}
+                <p class="mb-0"><i class="bi bi-exclamation-circle"></i>&nbsp;{{ msg }}</p>
+              {% endfor -%}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {% endwith %}
+      {% with errors = get_flashed_messages(category_filter=["success"]) %}
+        {% if errors %}
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-10 mt-4 alert alert-success alert-dismissible fade show" role="alert">
+              {%- for msg in errors %}
+                <p class="mb-0"><i class="bi bi-check-circle"></i>&nbsp;{{ msg }}</p>
+              {% endfor -%}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {% endwith %}
+    </section>
+
+    {% for category in categories %}
+      <div class="row justify-content-center align-items-center mt-2">
+        <div class="line"></div>
+        <div class="col my-2" id="{{category[1]}}">
+          <div class="category-section d-flex align-items-center my-4">
+            <h3 class="d-inline my-0 me-2">{{category[1]}}</h3>
+            <a href="../cat_edit/{{category[0]}}" class="btn btn-sm btn-outline-primary me-2"><i class="bi bi-pencil"></i></a>
+            {% set ns = namespace(found=false) %}
+            {% for vehicle in vehicles %}
+              {% if vehicle[9] == category[1] %}
+                {% set ns.found = true %}
+              {% endif %}
+            {% endfor %}
+            {% if ns.found %}
+              <a class="btn btn-sm disabled me-2" disabled><i class="bi bi-trash"></i></a>
+            {% else %}
+              <a href="../cat_delete/{{category[0]}}" class="btn btn-sm btn-outline-danger me-2"><i class="bi bi-trash"></i></a>
+            {% endif %}
+          </div>
+
+          {% if ns.found %}
+            <table class="table">
+              <thead>
+                <tr class="table-secondary">
+                  <th scope="col">#</th>
+                  <th scope="col">Dominio</th>
+                  <th scope="col">Imagen</th>
+                  <th scope="col">Título<span style="margin-left: 2px; font-size: x-small; color: blue">&#11205;</span></th>
+                  <th scope="col">Marca</th>
+                  <th scope="col">Modelo</th>
+                  <th scope="col">Año</th>
+                  <th scope="col">Resumen</th>
+                  <th scope="col">Descripción</th>
+                  <th scope="col">Categoría</th>
+                  <th scope="col">Prom</th>
+                  <th scope="col">Act</th>
+                  <th scope="col">Operaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for vehicle in vehicles %}
+                  {% if vehicle[9] == category[1] %}
+                    <tr>
+                      {% for fieldValue in vehicle %}
+                        {% if loop.index < 13 %}
+                          {% if loop.index != 2 %}
+                            {% if loop.index == 11 or loop.index == 12 %}
+                              {% if fieldValue %}
+                                <td>Si</td>
+                              {% else %}
+                                <td>No</td>
+                              {% endif %}
+                            {% else %}
+                              {% if loop.index == 3 %}
+                                <td>
+                                  <img src="../static/images/upload/{{ fieldValue }}" alt="vehicle image" width="100" class="rounded">
+                                </td>
+                              {% else %}
+                                {% if loop.index == 9 and fieldValue|length > 50 %}
+                                    <td>{{ fieldValue|truncate(50, true) }}</td>
+                                {% else %}
+                                    <td>{{ fieldValue}}</td>
+                                {% endif %}
+                              {% endif %}
+                            {% endif %}
+                          {% else %}
+                            <th scope="row">{{fieldValue}}</th>
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                      <td>
+                        <a href="../vhc_edit/{{vehicle[0]}}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop_{{vehicle[0]}}"><i class="bi bi-trash"></i></button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="staticBackdrop_{{vehicle[0]}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel_{{vehicle[0]}}"><i class="bi bi-exclamation-triangle"></i>&nbsp;Control de cambios</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                              </div>
+                              <div class="modal-body">
+                                <p>La eliminación de registros de la tabla <span class="fw-bold">no es reversible</span>.
+                                  Si confirma la operación, se eliminará el registro del dominio <strong>{{vehicle[1]}}</strong>
+                                  de manera permanente. Pulse "Confirmar" para eliminarlo, o "Cancelar" para
+                                  volver a la pantalla anterior.
+                                </p>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cerrar">Cancelar</button>
+                                <a href="../vhc_delete/{{vehicle[0]}}" class="btn btn-danger">Confirmar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p class="text-center">Aún no hay vehículos que pertenezcan a ésta categoría</p>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</main>
+<script>
+  // Get the button:
+let mybutton = document.getElementById("top-btn");
+
+// When the user scrolls down 100px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0; // For Safari
+  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
+</script>
+{% endblock %}

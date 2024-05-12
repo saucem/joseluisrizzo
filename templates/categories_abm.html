@@ -1,0 +1,84 @@
+{% extends './abm_layout.html' %}
+
+{% block title %}
+  José Luis Rizzo | Listado de vehículos
+{% endblock %}
+
+{% block navTitle %}
+  Listado de vehículos
+{% endblock %}
+
+{% block navAction %}
+  <a href="./create/} " class="col-2 btn btn-success"><i class="bi bi-add"></i>Nuevo vehículo</a>
+{% endblock %}
+
+{% block main %}
+<main>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="container">
+    <div class="row justify-content-center align-items-center my-4">
+      <div class="col-12 col-sm-2 align-items-center">
+        <p class="category-title m-0">Categorías:</p>
+      </div>
+      <div class="col">
+        {% for category in categories %}
+          <a href="#{{category[1]}}" class="btn btn-outline-secondary my-1">{{category[1]}}</a>
+        {% endfor %}
+      </div>
+      <div class="col-12 col-sm-2 text-end">
+        <a href="" class="btn btn-secondary">Nueva categoría</a>
+      </div>
+    </div>
+    <div class="col-10 line"></div>
+    <div class="row justify-content-center align-items-center mt-sm-2">
+      <div class="col" id="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Dominio</th>
+              <th scope="col">Imagen</th>
+              <th scope="col">Título</th>
+              <th scope="col">Marca</th>
+              <th scope="col">Modelo</th>
+              <th scope="col">Año</th>
+              <th scope="col">Resumen</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Categoría</th>
+              <th scope="col">Prom</th>
+              <th scope="col">Act</th>
+              <th scope="col">Operaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for vehicle in vehicles %}
+              <tr>
+                {% for fieldValue in vehicle %}
+                  {% if loop.index != 2 %}
+                    {% if loop.index == 11 or loop.index == 12 %}
+                      {% if fieldValue %}
+                        <td>Si</td>
+                      {% else %}
+                        <td>No</td>
+                      {% endif %}
+                    {% else %}
+                      <td>{{ fieldValue}}</td>
+                    {% endif %}
+                  {% else %}
+                    <th scope="row">{{fieldValue}}</th>
+                  {% endif %}
+                {% endfor %}
+                <td>
+                  <a href="../edit/{{vehicle[0]}}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                  <a href="../delete/{{vehicle[0]}}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

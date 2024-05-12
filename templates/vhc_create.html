@@ -1,0 +1,128 @@
+{% extends './abm_layout.html' %}
+
+{% block title %}
+  José Luis Rizzo | Agregar vehículo
+{% endblock %}
+
+{% block navTitle %}
+  Agregar vehículo
+{% endblock %}
+
+{% block navAction %}
+  <a href="../vehicles_abm" class="col-2 btn btn-outline-success"><i class="bi bi-add"></i>Volver al listado</a>
+{% endblock %}
+
+{% block main %}
+  {% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors %}
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-10 mt-4 alert alert-danger alert-dismissible fade show" role="alert">
+          {%- for msg in errors %}
+            <p class="mb-0"><i class="bi bi-exclamation-circle"></i>&nbsp;{{ msg }}</p>
+          {% endfor -%}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endwith %}
+  {% with errors = get_flashed_messages(category_filter=["success"]) %}
+    {% if errors %}
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-10 mt-4 alert alert-success alert-dismissible fade show" role="alert">
+          {%- for msg in errors %}
+            <p class="mb-0"><i class="bi bi-check-circle"></i>&nbsp;{{ msg }}</p>
+          {% endfor -%}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="container">
+    <div class="row justify-content-evenly">
+      <div class="col col-md-8 mt-4">
+        <form class="row g-3" method="post" action="/vhc_save" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="col col-sm-2">
+            <label for="domain" class="form-label">Dominio</label>
+            <input type="text" style="text-transform: uppercase;" class="form-control" name="domain" id="domain" aria-describedby="Dominio" required>
+          </div>
+          <div class="col col-sm-3">
+            <label for="brand" class="form-label">Marca</label>
+            <input type="text" class="form-control" name="brand" id="brand" required>
+          </div>
+          <div class="col col-sm-5">
+            <label for="model" class="form-label">Modelo</label>
+            <input type="text" class="form-control" name="model" id="model">
+          </div>
+          <div class="col col-sm-2">
+            <label for="year" class="form-label">Año</label>
+            <input type="number" value="0" class="form-control" name="year" id="year" required>
+          </div>
+          <div class="col col-sm-6">
+            <label for="title" class="form-label">Título</label>
+            <input type="text" class="form-control" name="title" id="title" required>
+          </div>
+          <div class="col col-sm-6">
+            <label class="form-label" for="category">Categoría</label>
+            <select class="form-select" name="category" id="category">
+              {% for category in categories %}
+                <option value="{{category[1]}}">{{category[1]}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12">
+            <label for="short_desc" class="form-label">Resumen</label>
+            <input type="text" class="form-control" name="short_desc" id="short_desc" required>
+          </div>
+          <div class="col-12">
+            <label for="long_desc" class="form-label">Descripción</label>
+            <textarea class="form-control" rows="3" name="long_desc" id="long_desc"></textarea>
+          </div>
+          {% for item in range(10) %}
+            <div class="col-12 col-sm-6">
+              {% if loop.index == 1 %}
+                <label for="image_0{{loop.index-1}}" class="form-label">Foto de Portada</label>
+              {% else %}
+                <label for="image_0{{loop.index-1}}" class="form-label">Foto {{loop.index}}</label>
+              {% endif %}
+              <input type="file" class="form-control" name="image_0{{loop.index-1}}" id="image_0{{loop.index-1}}" accept="image/*">
+            </div>
+          {% endfor %}
+          <div class="col mt-4">
+            <div class="col-6 col-sm-3 form-check form-check-inline">
+              <input type="checkbox" class="form-check-input" name="visible" id="visible" checked>
+              <label class="form-check-label" for="visible">Activo</label>
+            </div>
+            <div class="col-6 col-sm-3 form-check form-check-inline">
+              <input type="checkbox" class="form-check-input" name="promoted" id="promoted">
+              <label class="form-check-label" for="promoted">Promocionado</label>
+            </div>
+          </div>
+
+          <button type="submit" class="col col-3 btn btn-primary">Guardar</button>
+        </form>
+      </div>
+      <div class="col-3 card mt-4 px-0 h-100">
+        <img src="{{ url_for('static', filename='images/dummy.png') }}" alt="Foto del vehículo" class="rounded-top">
+        <div class="text-overlay text-center">
+          <p class="text-white fs-5 p-1">Foto de Portada</p>
+        </div>
+        <div class="card-body pb-0">
+          <h5 class="card-title">Titulo</h5>
+          <p class="card-text m-0">Marca</p>
+          <p class="card-text m-0">Modelo</p>
+          <p class="card-text m-0">Año</p>
+          <p class="card-text">Resumen</p>
+        </div>
+        <div class="card-footer bg-transparent">
+          <a class="btn btn-outline-primary w-100">Conocer más</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

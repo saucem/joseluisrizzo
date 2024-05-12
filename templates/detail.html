@@ -1,0 +1,186 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  José Luis Rizzo | {{vehicle[1]}}
+{% endblock %}
+
+{% block navitems %}
+<div class="collapse navbar-collapse" id="header-navbar">
+  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <li class="nav-item d-md-none"><a href="../#carousel" class="nav-link active">Inicio</a></li>
+    {% for category in categories %}
+      <li class="nav-item d-md-none"><a href="../showall/{{category[0]}}" class="nav-link active">{{ category[1] }}</a></li>
+    {% endfor %}
+    <li class="nav-item d-md-none"><a href="../#contacto" class="nav-link">Contacto</a></li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block aside %}
+<aside>
+  <nav class="d-none d-md-flex side-nav justify-content-center">
+    <div class="element-container">
+      <div class="side-logo-holder"></div>
+      <div class="side-navigation" id="sidenavbar">
+        <a href="../#carousel" class="side-nav-link active">HOME</a>
+        {% for category in categories %}
+          <a href="../showall/{{category[0]}}" class="side-nav-link">{{ category[1].upper() }}</a>
+        {% endfor %}
+        <a href="../#contacto" class="side-nav-link">CONTACTO</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+{% endblock %}
+
+
+{% block main %}
+
+{% with errors = get_flashed_messages(category_filter=["error"]) %}
+  {% if errors %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-10 mt-4 alert alert-danger alert-dismissible fade show" role="alert">
+        {%- for msg in errors %}
+          <p class="mb-0"><i class="bi bi-exclamation-circle"></i>&nbsp;{{ msg }}</p>
+        {% endfor -%}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endwith %}
+{% with errors = get_flashed_messages(category_filter=["success"]) %}
+  {% if errors %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-10 mt-4 alert alert-success alert-dismissible fade show" role="alert">
+        {%- for msg in errors %}
+          <p class="mb-0"><i class="bi bi-check-circle"></i>&nbsp;{{ msg }}</p>
+        {% endfor -%}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endwith %}
+
+<div class="container d-flex w-100 justify-content-evenly" id="product">
+  <div class="row w-100">
+    <div id="product-carousel" class="carousel slide carousel-fade col-12 col-sm-6">
+      <div class="carousel-inner mt-4 mt-sm-0 mb-2">
+        {% for index in range(5) %}
+          {% if index == 0 %}
+            {% if vehicle[2] != '' %}
+              <div class="carousel-item active" id="product-slide-0{{index}}" style="background-image: url(/static/images/upload/{{vehicle[2]}});"></div>
+            {% endif %}
+          {% else %}
+            {% if vehicle[index+11] != '' %}
+              <div class="carousel-item" id="product-slide-0{{index}}" style="background-image: url(/static/images/upload/{{vehicle[index+11]}});"></div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="container h-25">
+        <ol class="carousel-indicators">
+          {% for index in range(5) %}
+            {% if index == 0 %}
+              {% if vehicle[2] != '' %}
+                <li class="active" data-bs-slide-to="{{index}}" data-bs-target="#product-carousel">
+                  <img alt="" src="{{ url_for('static', filename='images/upload/' + vehicle[2]) }}" class="carousel-image-indicator">
+                </li>
+              {% endif %}
+            {% else %}
+              {% if vehicle[index+11] != '' %}
+              <li class="" data-bs-slide-to="{{index}}" data-bs-target="#product-carousel">
+                <img alt="" src="{{ url_for('static', filename='images/upload/' + vehicle[index+11]) }}" class="carousel-image-indicator">
+              </li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 d-flex flex-wrap mt-4">
+      <div class="col-12" id="product-info">
+        <h1>{{vehicle[3]}}</h1>
+        <div class="line"></div>
+        <h2 class="mt-2 mb-0">{{vehicle[4]}}&nbsp;{{vehicle[5]}}</h2>
+        {% if vehicle[6] >= 1900 %}
+          <h3 class="mb-2 mt-0">Año&nbsp;{{vehicle[6]}}</h3>
+        {% endif %}
+        <p class="m-0">{{vehicle[8]}}</p>
+        <h5 class="my-2">Dominio:&nbsp;{{vehicle[1]}}</h5>
+      </div>
+      <div class="col-12 text-center mt-4 mt-md-2 d-none d-md-block">
+        <a href="https://wa.me/5491153088761?text=Hola,%20quisiera%20que%20me%20asesoren%20acerca%20del%20vehículo%20con%20dominio: {{vehicle[1]}}" class="btn btn-whatsapp col-4 col-sm-6"><i class="bi bi-whatsapp"></i>&nbsp;Hablemos</a>
+      </div>
+      <div class="col-12 text-center mt-4 mt-md-0 d-md-none">
+        <a href="tel:+5491153088761" class="btn btn-primary col-8"><i class="bi bi-telephone-outbound"></i>&nbsp;Hablemos</a>
+      </div>
+      <div class="col-12">
+        <p class="mt-4">O podés completar el formulario para que un agente se ponga en contacto:</p>
+        <form class="mb-0" name="contact-form" id="contact-form" method="POST" action="/contact/detail">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="id" id="id" value="{{ vehicle[0] }}">
+          <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="name" name="name" aria-describedby="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label for="phone" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="phone" name="phone" aria-describedby="teléfono">
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="email" name="email" aria-describedby="email-help" required>
+            <div id="email-help" class="form-text">Nunca compartiremos tu información con nadie</div>
+          </div>
+          <div class="mb-3">
+            <label for="message" class="form-label">Consulta</label>
+            <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6">
+              <label for="human" class="form-label">Resolver: 5+2=?</label>
+              <input type="text" class="form-control" id="human" name="human" aria-describedby="solve" required>
+            </div>
+            <div class="col-6 d-flex align-items-end">
+              <button type="submit" class="btn btn-warning">Enviar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="line"></div>
+</div>
+
+<div class="container py-4">
+  <h4 class="text-soft ms-2">Recomendados</h4>
+  <div class="col-12 carousel-snap d-flex align-items-center">
+    {% set ns = namespace(currentCategory=vehicle[9], currentId=vehicle[0]) %}
+    {% for vehicle in vehicles %}
+      {% if vehicle[10] and vehicle[11] and vehicle[9] == ns.currentCategory and vehicle[0] != ns.currentId %}
+        <div class="col-2 carousel-snap-item mx-2 my-3">
+          <div class="card h-100 m-1 p-0">
+            <img src="{{ url_for('static', filename='images/upload/' + vehicle[2]) }}" alt="Foto del vehículo" class="rounded-top m-1">
+            <div class="card-body p-1 pb-0">
+              <h6 class="card-title">{{ vehicle[3] }}</h6>
+              <p class="card-text m-0">{{ vehicle[4] }}&nbsp;{{ vehicle[5] }}</p>
+              <p class="card-text">{{ vehicle[7] }}</p>
+            </div>
+            <div class="card-footer bg-transparent m-1 mb-0">
+              <a href="../detail/{{vehicle[0]}} " class="btn btn-outline-primary w-100">Conocer más</a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

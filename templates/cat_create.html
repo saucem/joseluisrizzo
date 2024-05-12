@@ -1,0 +1,52 @@
+{% extends './abm_layout.html' %}
+
+{% block title %}
+  José Luis Rizzo | Agregar categoría
+{% endblock %}
+
+{% block navTitle %}
+  Agregar categoría
+{% endblock %}
+
+{% block navAction %}
+  <a href="../vehicles_abm" class="col-2 btn btn-outline-success"><i class="bi bi-add"></i>Volver al listado</a>
+{% endblock %}
+
+{% block main %}
+  <div class="container">
+    <div class="row justify-content-evenly">
+      <div class="col-12 col-sm-8 my-4">
+        <form class="row g-3" method="post" action="/cat_save" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="col-4">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" class="form-control" name="name" id="name" aria-describedby="Nombre" required>
+          </div>
+          <div class="col-8 form-input-group">
+            <div class="col-12">
+              <label for="image" class="form-label">Foto banner</label>
+              <input type="file" class="form-control" name="image" id="image" accept="image/*">
+            </div>
+            <div class="col-12 mt-2 form-check">
+              <label class="form-check-label" for="carousel">Mostrar en banner</label>
+              <input type="checkbox" class="form-check-input" name="carousel" id="carousel" checked>
+            </div>
+          </div>
+          <div class="col-12 text-end">
+            <button type="submit" class="col col-3 btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+      <div class="card col-12 col-sm-3 text-bg-light my-4 px-0">
+        <div class="card-header">
+          <h5 class="cart-title my-0">Categorías</h1>
+        </div>
+        <div class="card-body">
+          {% for category in categories %}
+            <p class="my-1">{{category[1]}}</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

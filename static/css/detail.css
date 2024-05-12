@@ -1,0 +1,18 @@
+.carousel-indicators [data-bs-target]{
+  background-color: white;
+}
+
+.carousel-indicators-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scroll-snap-type: x mandatory;
+}
+
+.carousel-indicators{
+    justify-content: start;
+}
+
+.carousel-indicators li{
+    scroll-snap-align: none start;
+}
